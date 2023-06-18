@@ -1,15 +1,26 @@
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+
 export class AddUserDto {
-  readonly nombre: string;
-  readonly apellido: string;
+  @IsNotEmpty()
+  @IsString()
+  readonly firstName: string;
+  @IsNotEmpty()
+  @IsString()
+  readonly lastName: string;
+  @IsNotEmpty()
+  @IsEmail()
   readonly email: string;
+  @IsNotEmpty()
+  @IsString()
   readonly password: string;
-  readonly rol: string;
+  @IsString()
+  readonly role: string = 'user';
 }
 
 export class UpdateUserDto {
-  readonly nombre?: string;
-  readonly apellido?: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
   readonly email?: string;
   readonly password?: string;
-  readonly rol?: string;
+  readonly role?: string;
 }
