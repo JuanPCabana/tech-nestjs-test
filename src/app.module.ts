@@ -7,6 +7,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { User, UserSchema } from './models/user.model';
 import { AuthService } from './services/auth/auth.service';
+import { EmailService } from './services/email/email.service';
+import { AuthController } from './controllers/auth/auth.controller';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { AuthService } from './services/auth/auth.service';
     MongooseModule.forRoot(process.env.DATABASE_URI, {}),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService, AuthService],
+  controllers: [AppController, UsersController, AuthController],
+  providers: [AppService, UsersService, AuthService, EmailService],
 })
 export class AppModule {}

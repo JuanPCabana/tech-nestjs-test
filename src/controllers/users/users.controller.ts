@@ -25,6 +25,7 @@ export class UsersController {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) { }
 
+  //Add user
   @Post()
   async addUser(@Body() payload: AddUserDto) {
     const userInfo = new this.userModel(payload);
@@ -46,22 +47,26 @@ export class UsersController {
     );
   }
 
+  //getUserById
   @Get(':userId')
   //el parseIntPipe funciona para transformar de string a number los query params
   getUser(@Param('userId', ParseIntPipe) userId: number) {
     return `Info del usuario: ${userId}`;
   }
 
+  //updateUser
   @Patch()
   updateUser(@Body('userId') userId: string) {
     return `actualizado usuario: ${userId}`;
   }
 
+  //deleteUser
   @Delete()
   deleteUser(@Body('userId') userId: string) {
     return `Info del usuario: ${userId}`;
   }
 
+  //getAllUsers
   @Get()
   getUsers(
     @Query('limit') limit = 100,
