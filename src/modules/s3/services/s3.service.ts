@@ -9,6 +9,7 @@ import { RenameFileDto, UploadedFileByUrlDto } from '../dtos/s3.dto';
 import { async } from 'rxjs';
 import axios from 'axios';
 import getImageFormat from 'src/helpers/getImageFormat.helper';
+import * as mime from 'mime-types';
 
 
 @Injectable()
@@ -127,9 +128,9 @@ export class S3Service {
   async uploadFileByUrl(fileInfo: UploadedFileByUrlDto) {
     const { fileName, url } = fileInfo;
 
-    const image = await axios.get(url)
+    const image = await axios.get(url, { responseType: 'arraybuffer' })
     const imageBuffer = Buffer.from(image.data, 'binary');
-    const imageFormat = getImageFormat(image.headers['content-type']);
+    const imageFormat = mime.extension(image.headers['content-type']);
     if (!imageFormat) {
       responseHandler.handleErrorResponse(400, 'Url Invalida!')
     }
