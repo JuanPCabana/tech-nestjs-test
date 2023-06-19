@@ -23,8 +23,8 @@ export class AuthController {
   // @UseGuards(AuthGuard('local'))
   @ApiOperation({summary:'Email and password login'})
   async login(@Res() res: Response, @Body() payload: LoginDto) {
-    const userInfo = await this.authService.loginUser(res, payload);
-    return userInfo
+    const response = await this.authService.loginUser(res, payload);
+    return response
   }
 
   @Get('google')
