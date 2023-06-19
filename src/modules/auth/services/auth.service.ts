@@ -39,7 +39,9 @@ export class AuthService {
     }
     const returnUser = userInfo.toObject()
     delete returnUser.password
-    return returnUser
+    const token = jwt.sign({ _id: userInfo._id }, process.env.JWT_SECRET_KEY)
+
+    return responseHandler.handleResponse({ returnUser, token })
   }
 
   async googleLogin(req) {

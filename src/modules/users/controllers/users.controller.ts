@@ -13,7 +13,7 @@ import { AddUserDto } from '../dtos/users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from '../services/users.service';
 import { User } from '../models/user.model';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import responseHandler from 'src/helpers/response.helper';
 import { PasswordService } from 'src/modules/auth/services/password.service';
 
@@ -51,8 +51,7 @@ export class UsersController {
 
   //getUserById
   @Get(':userId')
-  //el parseIntPipe funciona para transformar de string a number los query params
-  getUser(@Param('userId', ParseIntPipe) userId: number) {
+  getUser(@Param('userId') userId: ObjectId) {
     return `Info del usuario: ${userId}`;
   }
 
