@@ -17,7 +17,7 @@ import { S3Module } from './modules/s3/s3.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.DATABASE_URI, {}),
     AuthModule,
     UsersModule,

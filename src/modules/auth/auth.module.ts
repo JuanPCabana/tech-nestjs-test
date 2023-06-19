@@ -14,7 +14,6 @@ import { GoogleStrategy } from './oAuth/strategies/google.strategy';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     PassportModule,
     AuthModule,
     EmailModule,

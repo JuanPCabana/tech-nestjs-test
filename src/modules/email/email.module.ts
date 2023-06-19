@@ -3,7 +3,7 @@ import { EmailService } from './services/email.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot(),],
+  imports: [],
   controllers: [],
   providers: [EmailService],
   exports: [EmailService],
