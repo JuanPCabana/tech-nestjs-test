@@ -40,9 +40,11 @@ export class UsersController {
       userInfo.password,
     );
     userInfo.password = encriptedPass;
-    const resp = await this.userService.create(userInfo);
+    const queryResult = await this.userService.create(userInfo);
+    const createdUser = queryResult.toObject()
+    delete createdUser.password
     return responseHandler.handleResponse(
-      resp,
+      createdUser,
       'Usuario creado correctamente!',
     );
   }

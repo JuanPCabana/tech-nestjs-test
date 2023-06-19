@@ -37,9 +37,9 @@ export class AuthService {
         "Usuario o password incorrecto!"
       )
     }
-
-    delete userInfo.password
-    return userInfo
+    const returnUser = userInfo.toObject()
+    delete returnUser.password
+    return returnUser
   }
 
   async googleLogin(req) {
@@ -60,9 +60,10 @@ export class AuthService {
       userInfo = await newUser.save()
     }
     else {
-      delete alreadyRegisteredInfo.password
-      userInfo = alreadyRegisteredInfo
+      userInfo = alreadyRegisteredInfo.toObject()
     }
+
+    delete userInfo.password
 
     const token = jwt.sign({ _id: userInfo._id }, process.env.JWT_SECRET_KEY)
     const response = {

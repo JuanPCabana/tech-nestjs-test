@@ -12,6 +12,7 @@ import { AuthService } from './modules/auth/services/auth.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { EmailModule } from './modules/email/email.module';
+import { S3Module } from './modules/s3/s3.module';
 
 
 @Module({
@@ -20,7 +21,8 @@ import { EmailModule } from './modules/email/email.module';
     MongooseModule.forRoot(process.env.DATABASE_URI, {}),
     AuthModule,
     UsersModule,
-    EmailModule
+    EmailModule,
+    S3Module
   ],
   controllers: [AppController],
   providers: [AppService],
