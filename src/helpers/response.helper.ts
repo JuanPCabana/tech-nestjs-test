@@ -1,4 +1,4 @@
-const handleResponse = (message = 'Ok', body) => {
+const handleResponse = (body: Object, message = 'Ok') => {
   return {
     message,
     body,

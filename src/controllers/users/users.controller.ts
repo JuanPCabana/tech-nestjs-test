@@ -14,14 +14,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from 'src/services/users/users.service';
 import { User } from 'src/models/user.model';
 import { Model } from 'mongoose';
-import { AuthService } from 'src/services/auth/auth.service';
+import { PasswordService } from 'src/services/auth/password.service';
 import responseHandler from 'src/helpers/response.helper';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly userService: UsersService,
-    private readonly authService: AuthService,
+    private readonly authService: PasswordService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) { }
 
@@ -42,8 +42,8 @@ export class UsersController {
     userInfo.password = encriptedPass;
     const resp = await this.userService.create(userInfo);
     return responseHandler.handleResponse(
+      resp,
       'Usuario creado correctamente!',
-      resp
     );
   }
 

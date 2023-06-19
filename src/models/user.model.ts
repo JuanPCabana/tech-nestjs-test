@@ -1,6 +1,12 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+export class RecoveryTokenModel {
+  @Prop({})
+  token: string;
+  @Prop({})
+  expirationDate: number;
+}
 @Schema()
 export class User extends Document {
   // @Prop()
@@ -11,10 +17,14 @@ export class User extends Document {
   lastName: string;
   @Prop({ required: true })
   email: string;
-  @Prop({ required: true })
+  @Prop({})
   password: string;
-  @Prop({ required: true })
-  role: string;
+  @Prop({ default: 'user' })
+  role: string
+  @Prop({})
+  recoveryToken: RecoveryTokenModel;
 }
+
+
 
 export const UserSchema = SchemaFactory.createForClass(User);
