@@ -16,7 +16,9 @@ import { User } from '../models/user.model';
 import { Model, ObjectId } from 'mongoose';
 import responseHandler from 'src/helpers/response.helper';
 import { PasswordService } from 'src/modules/auth/services/password.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -27,6 +29,7 @@ export class UsersController {
 
   //Add user
   @Post()
+  @ApiOperation({summary:'Register a user'})
   async addUser(@Body() payload: AddUserDto) {
     const userInfo = new this.userModel(payload);
     const exist = await this.userService.findByEmail(userInfo.email)
@@ -51,24 +54,29 @@ export class UsersController {
 
   //getUserById
   @Get(':userId')
+  @ApiOperation({summary:'Get user by objectId'})
+
   getUser(@Param('userId') userId: ObjectId) {
     return `Info del usuario: ${userId}`;
   }
 
   //updateUser
   @Patch()
+  @ApiOperation({summary:'Update user by objectId'})
   updateUser(@Body('userId') userId: string) {
     return `actualizado usuario: ${userId}`;
   }
 
   //deleteUser
   @Delete()
+  @ApiOperation({summary:'Delete User by objectId'})
   deleteUser(@Body('userId') userId: string) {
     return `Info del usuario: ${userId}`;
   }
 
   //getAllUsers
   @Get()
+  @ApiOperation({summary:'Get all Users'})
   getUsers(
     @Query('limit') limit = 100,
     @Query('offset') offset = 0,
