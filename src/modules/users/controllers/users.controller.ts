@@ -9,13 +9,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { AddUserDto } from 'src/dtos/users.dto';
+import { AddUserDto } from '../dtos/users.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsersService } from 'src/services/users/users.service';
-import { User } from 'src/models/user.model';
+import { UsersService } from '../services/users.service';
+import { User } from '../models/user.model';
 import { Model } from 'mongoose';
-import { PasswordService } from 'src/services/auth/password.service';
 import responseHandler from 'src/helpers/response.helper';
+import { PasswordService } from 'src/modules/auth/services/password.service';
 
 @Controller('users')
 export class UsersController {

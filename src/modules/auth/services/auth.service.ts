@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { LoginDto, GoogleStrategyDto, RecoveryTokenDto, ResetPasswordDto } from 'src/dtos/auth.dto';
+import { LoginDto, GoogleStrategyDto, RecoveryTokenDto, ResetPasswordDto } from 'src/modules/auth/dtos/auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { RecoveryTokenModel, User } from 'src/models/user.model';
+import { RecoveryTokenModel, User, } from 'src/modules/users/models/user.model';
 import { Model } from 'mongoose';
 import responseHandler from 'src/helpers/response.helper';
 import { PasswordService } from './password.service';
 import * as jwt from 'jsonwebtoken';
-import { EmailService } from '../email/email.service';
+import { EmailService } from 'src/modules/email/services/email.service';
 import { randomBytes } from 'crypto';
 
 @Injectable()

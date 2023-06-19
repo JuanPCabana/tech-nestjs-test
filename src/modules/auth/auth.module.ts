@@ -1,21 +1,25 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from 'src/controllers/auth/auth.controller';
-import { User, UserSchema } from 'src/models/user.model';
-import { JwtStrategy } from 'src/oAuth/strategies/jwt.strategy';
-import { LocalStrategy } from 'src/oAuth/strategies/local.strategy';
-import { AuthService } from 'src/services/auth/auth.service';
-import { PasswordService } from 'src/services/auth/password.service';
-import { EmailService } from 'src/services/email/email.service';
+import { AuthController } from './controllers/auth.controller';
+import { User, UserSchema } from '../users/models/user.model';
+import { JwtStrategy } from './oAuth/strategies/jwt.strategy';
+import { LocalStrategy } from './oAuth/strategies/local.strategy';
+import { AuthService } from './services/auth.service';
+import { PasswordService } from './services/password.service';
+import { EmailModule } from '../email/email.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     PassportModule,
     AuthModule,
+    EmailModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, PasswordService, EmailService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, PasswordService],
+  exports: [AuthService, PasswordService],
 })
 export class AuthModule { }

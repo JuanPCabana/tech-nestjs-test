@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LoginDto, RecoveryTokenDto, ResetPasswordDto } from 'src/dtos/auth.dto';
-import { LocalStrategy } from 'src/oAuth/strategies/local.strategy';
-import { AuthService } from 'src/services/auth/auth.service';
-import { PasswordService } from 'src/services/auth/password.service';
-import { EmailService } from 'src/services/email/email.service';
+import { LoginDto, RecoveryTokenDto, ResetPasswordDto } from 'src/modules/auth/dtos/auth.dto';
+import { LocalStrategy } from '../oAuth/strategies/local.strategy';
+import { AuthService } from '../services/auth.service';
+import { PasswordService } from '../services/password.service';
+import { EmailService } from 'src/modules/email/services/email.service';
 import { Request } from 'express';
 
 @Controller('auth')
