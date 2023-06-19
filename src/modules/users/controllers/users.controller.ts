@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { AddUserDto } from '../dtos/users.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -17,6 +18,7 @@ import { Model, ObjectId } from 'mongoose';
 import responseHandler from 'src/helpers/response.helper';
 import { PasswordService } from 'src/modules/auth/services/password.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('Users')
 @Controller('users')
@@ -29,12 +31,13 @@ export class UsersController {
 
   //Add user
   @Post()
-  @ApiOperation({summary:'Register a user'})
-  async addUser(@Body() payload: AddUserDto) {
+  @ApiOperation({ summary: 'Register a user' })
+  async addUser(@Res() res: Response, @Body() payload: AddUserDto) {
     const userInfo = new this.userModel(payload);
     const exist = await this.userService.findByEmail(userInfo.email)
     if (exist) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         'El usuario ya existe!'
       );
@@ -47,14 +50,16 @@ export class UsersController {
     const createdUser = queryResult.toObject()
     delete createdUser.password
     return responseHandler.handleResponse(
+      res,
       createdUser,
       'Usuario creado correctamente!',
+      201
     );
   }
 
   //getUserById
   @Get(':userId')
-  @ApiOperation({summary:'Get user by objectId'})
+  @ApiOperation({ summary: 'Get user by objectId' })
 
   getUser(@Param('userId') userId: ObjectId) {
     return `Info del usuario: ${userId}`;
@@ -62,21 +67,21 @@ export class UsersController {
 
   //updateUser
   @Patch()
-  @ApiOperation({summary:'Update user by objectId'})
+  @ApiOperation({ summary: 'Update user by objectId' })
   updateUser(@Body('userId') userId: string) {
     return `actualizado usuario: ${userId}`;
   }
 
   //deleteUser
   @Delete()
-  @ApiOperation({summary:'Delete User by objectId'})
+  @ApiOperation({ summary: 'Delete User by objectId' })
   deleteUser(@Body('userId') userId: string) {
     return `Info del usuario: ${userId}`;
   }
 
   //getAllUsers
   @Get()
-  @ApiOperation({summary:'Get all Users'})
+  @ApiOperation({ summary: 'Get all Users' })
   getUsers(
     @Query('limit') limit = 100,
     @Query('offset') offset = 0,

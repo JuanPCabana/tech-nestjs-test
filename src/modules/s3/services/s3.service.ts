@@ -27,7 +27,7 @@ export class S3Service {
 
   }
 
-  async uploadFile(fileName: string, file: Buffer) {
+  async uploadFile(res: Response, fileName: string, file: Buffer) {
     const params = {
       Bucket: this.configService.getOrThrow('BUCKET_NAME'),
       Key: fileName,
@@ -37,10 +37,10 @@ export class S3Service {
     try {
       const command = new PutObjectCommand(params);
       const data = await this.s3Client.send(command);
-      return responseHandler.handleResponse({}, 'Archivo cargado correctamente!')
+      return responseHandler.handleResponse(res, {}, 'Archivo cargado correctamente!',  201)
     } catch (error) {
       console.log(error);
-      return responseHandler.handleErrorResponse(500, 'Error inesperado!')
+      return responseHandler.handleErrorResponse(res, 500, 'Error inesperado!')
     }
   }
 
@@ -60,11 +60,11 @@ export class S3Service {
 
     }
     catch (err) {
-      return res.send(responseHandler.handleErrorResponse(400, 'El archivo no existe o no esta disponible!'))
+      return res.send(responseHandler.handleErrorResponse(res, 400, 'El archivo no existe o no esta disponible!'))
     }
   }
 
-  async renameFile(body: RenameFileDto) {
+  async renameFile(res:Response, body: RenameFileDto) {
     const { fileName, newFileName } = body;
     const params = {
       Bucket: this.configService.getOrThrow('BUCKET_NAME'),
@@ -83,13 +83,13 @@ export class S3Service {
       await this.s3Client.send(deleteCommand);
 
     } catch (error) {
-      return responseHandler.handleErrorResponse(400, 'Ocurrio un error intentando renombrar un archivo, verifique que el nombre sea el correcto!')
+      return responseHandler.handleErrorResponse(res, 400, 'Ocurrio un error intentando renombrar un archivo, verifique que el nombre sea el correcto!')
     }
 
-    return responseHandler.handleResponse({}, 'Archivo renombrado correctamente!')
+    return responseHandler.handleResponse(res, {}, 'Archivo renombrado correctamente!')
   }
 
-  async getObjectUrl(fileName: string) {
+  async getObjectUrl(res: Response, fileName: string) {
     const params: AWS.S3.GetObjectRequest = {
       Bucket: this.configService.getOrThrow('BUCKET_NAME'),
       Key: fileName,
@@ -99,16 +99,16 @@ export class S3Service {
       const data = await this.s3.getObject(params).promise();
       if (data && data.Body) {
         const url = `https://${this.configService.getOrThrow('BUCKET_NAME')}.s3.amazonaws.com/${fileName}`;
-        return responseHandler.handleResponse({ url }, 'Url del archivo obtenida correctamente!');
+        return responseHandler.handleResponse(res, { url }, 'Url del archivo obtenida correctamente!');
       } else {
         throw new Error('No se pudo obtener el objeto de S3');
       }
     } catch (error) {
-      return responseHandler.handleErrorResponse(400, 'No se pudo obtener el objeto de S3!')
+      return responseHandler.handleErrorResponse(res, 400, 'No se pudo obtener el objeto de S3!')
     }
   }
 
-  async listObjects() {
+  async listObjects(res: Response) {
     const params: AWS.S3.ListObjectsV2Request = {
       Bucket: this.configService.getOrThrow('BUCKET_NAME'),
     };
@@ -116,26 +116,26 @@ export class S3Service {
     try {
       const data = await this.s3.listObjectsV2(params).promise();
       if (data && data.Contents) {
-        return responseHandler.handleResponse({ docs: data.Contents });
+        return responseHandler.handleResponse(res, { docs: data.Contents });
       } else {
         throw new Error('No se pudieron listar los objetos de S3');
       }
     } catch (error) {
-      return responseHandler.handleErrorResponse(400, 'No se pudo obtener los objetos de S3!')
+      return responseHandler.handleErrorResponse(res, 400, 'No se pudo obtener los objetos de S3!')
     }
   }
 
-  async uploadFileByUrl(fileInfo: UploadedFileByUrlDto) {
+  async uploadFileByUrl(res: Response, fileInfo: UploadedFileByUrlDto) {
     const { fileName, url } = fileInfo;
 
     const image = await axios.get(url, { responseType: 'arraybuffer' })
     const imageBuffer = Buffer.from(image.data, 'binary');
     const imageFormat = mime.extension(image.headers['content-type']);
     if (!imageFormat) {
-      responseHandler.handleErrorResponse(400, 'Url Invalida!')
+      responseHandler.handleErrorResponse(res, 400, 'Url Invalida!')
     }
 
-    return await this.uploadFile(`${fileName}.${imageFormat}`, imageBuffer)
+    return await this.uploadFile(res, `${fileName}.${imageFormat}`, imageBuffer)
 
   }
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { Response } from 'express';
 import responseHandler from 'src/helpers/response.helper';
 
 @Injectable()
@@ -7,7 +8,7 @@ export class UnsplashService {
 
   private readonly accessKey = process.env.UNSPLASH_ACCESS_KEY;
 
-  async searchImages(query: string) {
+  async searchImages(res:Response, query: string) {
     const url = `https://api.unsplash.com/search/photos?query=${query}`;
 
     try {
@@ -17,9 +18,9 @@ export class UnsplashService {
         },
       });
 
-      return responseHandler.handleResponse({ docs: response.data.results });
+      return responseHandler.handleResponse(res, { docs: response.data.results });
     } catch (error) {
-      return responseHandler.handleErrorResponse(400, 'Error al realizar la búsqueda de imágenes')
+      return responseHandler.handleErrorResponse(res, 400, 'Error al realizar la búsqueda de imágenes')
     }
   }
 

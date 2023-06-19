@@ -1,15 +1,20 @@
-const handleResponse = (body: Object, message = 'Ok') => {
-  return {
+import { Response } from "express";
+
+const handleResponse = (res: Response, body: Object, message = 'Ok', status = 200) => {
+
+  const responseObj = {
     message,
     body,
   };
+
+  return res.status(status).send(responseObj);
 };
 
-const handleErrorResponse = (status = 500, message = 'Error') => {
-  return {
+const handleErrorResponse = (res: Response, status = 500, message = 'Error') => {
+  const responseObj = {
     message,
-    status,
   };
+  return res.status(status).send(responseObj);
 };
 
 const responseHandler = Object.freeze({

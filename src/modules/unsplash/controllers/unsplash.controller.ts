@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { UnsplashService } from '../services/unsplash.service';
 import { S3Service } from 'src/modules/s3/services/s3.service';
 import { UploadedFileByUrlDto } from 'src/modules/s3/dtos/s3.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('Unsplash')
 @Controller('unsplash')
@@ -17,15 +18,15 @@ export class UnsplashController {
   @Get('search')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Search for an image in the Unsplash API.' })
-  async searchImages(@Query('query') query: string) {
-    return await this.unsplashService.searchImages(query);
+  async searchImages(@Res() res: Response, @Query('query') query: string) {
+    return await this.unsplashService.searchImages(res, query);
   }
 
   @Post('s3Upload')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Upload a file to S3 from an external API using only the image URL.' })
-  async uploadFileToS3(@Body() body: UploadedFileByUrlDto) {
-    return await this.s3Service.uploadFileByUrl(body);
+  async uploadFileToS3(@Res() res: Response, @Body() body: UploadedFileByUrlDto) {
+    return await this.s3Service.uploadFileByUrl(res, body);
   }
 
 }

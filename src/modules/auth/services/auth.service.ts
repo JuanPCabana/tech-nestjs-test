@@ -8,6 +8,7 @@ import { PasswordService } from './password.service';
 import * as jwt from 'jsonwebtoken';
 import { EmailService } from 'src/modules/email/services/email.service';
 import { randomBytes } from 'crypto';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -18,13 +19,14 @@ export class AuthService {
     private readonly emailService: EmailService
   ) { }
 
-  async loginUser(body: LoginDto): Promise<any> {
+  async loginUser(res: Response, body: LoginDto): Promise<any> {
 
     const { email, password } = body;
 
     const userInfo = await this.userModel.findOne({ email: email.toLowerCase() })
     if (!userInfo) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         "Usuario o password incorrecto!"
       )
@@ -33,6 +35,7 @@ export class AuthService {
     const validPassword = await this.passwordService.comparePasswords(password, userInfo.password)
     if (!validPassword) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         "Usuario o password incorrecto!"
       )
@@ -41,10 +44,10 @@ export class AuthService {
     delete returnUser.password
     const token = jwt.sign({ _id: userInfo._id }, process.env.JWT_SECRET_KEY)
 
-    return responseHandler.handleResponse({ returnUser, token })
+    return responseHandler.handleResponse(res, { returnUser, token })
   }
 
-  async googleLogin(req) {
+  async googleLogin(res: Response, req) {
     const user: GoogleStrategyDto = req.user
     if (!user) {
       return 'No user from google'
@@ -72,7 +75,7 @@ export class AuthService {
       user: userInfo,
       token
     }
-    return responseHandler.handleResponse(response)
+    return responseHandler.handleResponse(res, response)
 
   }
 
@@ -80,11 +83,12 @@ export class AuthService {
     return this.userModel.findOne({ _id: tokenPayload._id })
   }
 
-  async generateRecoveryToken(payload: RecoveryTokenDto) {
+  async generateRecoveryToken(res: Response, payload: RecoveryTokenDto) {
 
     const user = await this.userModel.findOne({ email: payload.email.toLowerCase() })
     if (!user) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         "No existe un usuario con ese email!"
       )
@@ -101,7 +105,7 @@ export class AuthService {
 
     await this.emailService.sendEmail(user.email, 'Codigo de recuperacion de contraseña', `El codigo para restaurar su contraseña es: ${token}`)
 
-    return responseHandler.handleResponse({}, 'Token enviado correctamente')
+    return responseHandler.handleResponse(res, {}, 'Token enviado correctamente')
   }
 
   generateRandomToken(length: number): string {
@@ -111,11 +115,12 @@ export class AuthService {
     return token.toUpperCase();
   }
 
-  async validateRecoveryToken(payload: ResetPasswordDto) {
+  async validateRecoveryToken(res: Response, payload: ResetPasswordDto) {
     const user = await this.userModel.findOne({ email: payload.email.toLowerCase() })
 
     if (user.recoveryToken.token !== payload.token) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         "El token de recuperacion es incorrecto!"
       )
@@ -123,6 +128,7 @@ export class AuthService {
 
     if (user.recoveryToken.expirationDate < Date.now()) {
       return responseHandler.handleErrorResponse(
+        res,
         400,
         "El token de recuperacion ha expirado!"
       )
@@ -131,6 +137,6 @@ export class AuthService {
     const hashedPassword = await this.passwordService.hashPassword(payload.password)
     await this.userModel.updateOne({ _id: user._id }, { $set: { password: hashedPassword }, $unset: { recoveryToken: 0 } })
 
-    return responseHandler.handleResponse({}, 'Contraseña actualizada correctamente!')
+    return responseHandler.handleResponse(res, {}, 'Contraseña actualizada correctamente!')
   }
 }

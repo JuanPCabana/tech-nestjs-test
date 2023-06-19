@@ -17,7 +17,7 @@ export class S3Controller {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload an image hosted in the "file" property of a multipart/form-data.' })
-  async uploadFile(
+  async uploadFile(@Res() res: Response,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -26,7 +26,7 @@ export class S3Controller {
         ]
       })
     ) file: UploadFileDto) {
-    await this.s3Service.uploadFile(file.originalname, file.buffer)
+    await this.s3Service.uploadFile(res, file.originalname, file.buffer)
   }
 
   @Get(':fileName')
@@ -39,22 +39,22 @@ export class S3Controller {
   @Post('rename')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Rename an s3 file' })
-  async renameFile(@Body() body: RenameFileDto) {
-    return await this.s3Service.renameFile(body)
+  async renameFile(@Res() res: Response, @Body() body: RenameFileDto) {
+    return await this.s3Service.renameFile(res, body)
   };
 
   @Get('url/:fileName')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get the URL of an object from an S3 bucket.' })
-  async getUrl(@Param('fileName') fileName: string) {
-    return await this.s3Service.getObjectUrl(fileName)
+  async getUrl(@Res() res: Response, @Param('fileName') fileName: string) {
+    return await this.s3Service.getObjectUrl(res, fileName)
   };
 
   @Get('')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'List the objects in an S3 bucket.' })
-  async listObjects() {
-    return await this.s3Service.listObjects()
+  async listObjects(@Res() res: Response,) {
+    return await this.s3Service.listObjects(res)
   };
 
 }
