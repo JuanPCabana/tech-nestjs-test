@@ -21,6 +21,7 @@ import { ConfigService } from '@nestjs/config';
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     }
-  ]
+  ],
+  exports: [S3Service]
 })
 export class S3Module { }

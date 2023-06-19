@@ -13,6 +13,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { EmailModule } from './modules/email/email.module';
 import { S3Module } from './modules/s3/s3.module';
+import { UnsplashModule } from './modules/unsplash/unsplash.module';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { S3Module } from './modules/s3/s3.module';
     AuthModule,
     UsersModule,
     EmailModule,
-    S3Module
+    S3Module,
+    UnsplashModule
   ],
   controllers: [AppController],
   providers: [AppService],

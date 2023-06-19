@@ -5,7 +5,10 @@ import { Response } from 'express';
 import getObjectOutputToBuffer from 'src/helpers/fileBuffer.helper';
 import responseHandler from 'src/helpers/response.helper';
 import * as AWS from 'aws-sdk';
-import { RenameFileDto } from '../dtos/s3.dto';
+import { RenameFileDto, UploadedFileByUrlDto } from '../dtos/s3.dto';
+import { async } from 'rxjs';
+import axios from 'axios';
+import getImageFormat from 'src/helpers/getImageFormat.helper';
 
 
 @Injectable()
@@ -27,7 +30,8 @@ export class S3Service {
     const params = {
       Bucket: this.configService.getOrThrow('BUCKET_NAME'),
       Key: fileName,
-      Body: file
+      Body: file,
+      ContentType: `image/${fileName.split('.')[1]}`
     }
     try {
       const command = new PutObjectCommand(params);
@@ -116,9 +120,22 @@ export class S3Service {
         throw new Error('No se pudieron listar los objetos de S3');
       }
     } catch (error) {
-      console.log("🚀 ~ file: s3.service.ts:119 ~ S3Service ~ listObjects ~ error:", error.message, params)
       return responseHandler.handleErrorResponse(400, 'No se pudo obtener los objetos de S3!')
     }
+  }
+
+  async uploadFileByUrl(fileInfo: UploadedFileByUrlDto) {
+    const { fileName, url } = fileInfo;
+
+    const image = await axios.get(url)
+    const imageBuffer = Buffer.from(image.data, 'binary');
+    const imageFormat = getImageFormat(image.headers['content-type']);
+    if (!imageFormat) {
+      responseHandler.handleErrorResponse(400, 'Url Invalida!')
+    }
+
+    return await this.uploadFile(`${fileName}.${imageFormat}`, imageBuffer)
+
   }
 
 }
