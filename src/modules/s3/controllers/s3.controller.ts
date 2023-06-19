@@ -1,8 +1,9 @@
-import { Controller, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from '../services/s3.service';
 import { get } from 'http';
 import { Response } from 'express';
+import { RenameFileDto } from '../dtos/s3.dto';
 
 @Controller('files')
 export class S3Controller {
@@ -26,8 +27,22 @@ export class S3Controller {
 
   @Get(':fileName')
   async downloadFile(@Res() res: Response, @Param('fileName') fileName: string) {
-    console.log(fileName);
-    await this.s3Service.downloadFile(res, fileName)
+    return await this.s3Service.downloadFile(res, fileName)
+  };
+
+  @Post('rename')
+  async renameFile(@Body() body: RenameFileDto) {
+    return await this.s3Service.renameFile(body)
+  };
+
+  @Get('url/:fileName')
+  async getUrl(@Param('fileName') fileName: string) {
+    return await this.s3Service.getObjectUrl(fileName)
+  };
+
+  @Get('')
+  async listObjects() {
+    return await this.s3Service.listObjects()
   };
 
 }
