@@ -74,11 +74,11 @@ UPLOAD_RATE_LIMIT=value
 UNSPLASH_ACCESS_KEY=value 
 ```
 ## Lanzar instancia con Node.Js
-Ingresas desde la terminal a la carpeta del proyecto, recuerda usar
+Ingresas desde la terminal a la carpeta del proyecto. Si estás usando Node version manager (nvm) recuerda usar:
 ```bash
 $ nvm use 
 ```
-Si estás usando Node version manager (nvm).
+Procede a instalar las dependencias del proyecto usando el comando:
 ```bash
 $ npm install
 ```
