@@ -9,16 +9,18 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AddUserDto } from '../dtos/users.dto';
+import { AddUserDto, UpdateUserDto } from '../dtos/users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from '../services/users.service';
 import { User } from '../models/user.model';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import responseHandler from 'src/helpers/response.helper';
 import { PasswordService } from 'src/modules/auth/services/password.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response, response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Users')
 @Controller('users')
@@ -59,34 +61,103 @@ export class UsersController {
 
   //getUserById
   @Get(':userId')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user by objectId' })
+  async getUser(@Res() res: Response, @Param('userId') userId: string) {
+    let userObjectId: Types.ObjectId
+    try {
+      userObjectId = new Types.ObjectId(userId)
+      const userInfo = (await this.userService.findByUserId(userObjectId))
 
-  getUser(@Param('userId') userId: ObjectId) {
-    return `Info del usuario: ${userId}`;
+      if (!userInfo) {
+        throw new Error('Usuario no encontrado!')
+      }
+
+      let returnUser = userInfo
+      delete returnUser.password
+      return responseHandler.handleResponse(res, returnUser);
+
+    } catch (error) {
+      return responseHandler.handleErrorResponse(
+        res,
+        400,
+        'El usuario no existe!'
+      );
+    }
   }
 
   //updateUser
-  @Patch()
+  @Patch(':userId')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user by objectId' })
-  updateUser(@Body('userId') userId: string) {
-    return `actualizado usuario: ${userId}`;
+  async updateUser(@Res() res: Response, @Param('userId') userId: string, @Body() body: UpdateUserDto) {
+    try {
+      const userObjectId = new Types.ObjectId(userId)
+      if (Object.keys(body).length === 0) {
+        throw new Error('No hay datos para actualizar!')
+      }
+      await this.userService.updateByUserId(userObjectId, body)
+
+      return responseHandler.handleResponse(res, {}, 'Usuario actualizado correctamente!');
+    } catch (error) {
+      return responseHandler.handleErrorResponse(
+        res,
+        400,
+        'No se ha podido actualizar el usuario!'
+      );
+    }
+    return body;
   }
 
   //deleteUser
-  @Delete()
+  @Delete(':userId')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete User by objectId' })
-  deleteUser(@Body('userId') userId: string) {
-    return `Info del usuario: ${userId}`;
+  async deleteUser(@Res() res: Response, @Param('userId') userId: string) {
+    let userObjectId: Types.ObjectId
+    try {
+      userObjectId = new Types.ObjectId(userId)
+      const userInfo = (await this.userService.findByUserId(userObjectId))
+
+      if (!userInfo) {
+        throw new Error('Usuario no encontrado!')
+      }
+
+      let returnUser = userInfo
+      delete returnUser.password
+      return responseHandler.handleResponse(res, returnUser, 'Usuario eliminado correctamente!');
+
+    } catch (error) {
+      return responseHandler.handleErrorResponse(
+        res,
+        400,
+        'El usuario no existe!'
+      );
+    }
   }
 
   //getAllUsers
   @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all Users' })
-  getUsers(
+  async getUsers(
+    @Res() res: Response,
     @Query('limit') limit = 100,
     @Query('offset') offset = 0,
-    @Query('role') role: string,
   ) {
-    return `Role:${role} limit: ${limit} : offset: ${offset}`;
+
+    const userList = await this.userService.getAll(limit, offset)
+
+    const returnUserList = userList.map(user => {
+      let userInfo = user.toObject()
+      delete userInfo.password
+      return userInfo
+    })
+
+    return responseHandler.handleResponse(res, returnUserList);
   }
 }

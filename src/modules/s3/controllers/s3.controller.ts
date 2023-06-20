@@ -5,7 +5,7 @@ import { get } from 'http';
 import { Response } from 'express';
 import { RenameFileDto, UploadFileDto } from '../dtos/s3.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('S3 Files')
 @Controller('files')
@@ -15,6 +15,7 @@ export class S3Controller {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload an image hosted in the "file" property of a multipart/form-data.' })
   async uploadFile(@Res() res: Response,
@@ -31,6 +32,7 @@ export class S3Controller {
 
   @Get(':fileName')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Download an image from S3, using the same file name as the one stored in the S3 bucket.' })
   async downloadFile(@Res() res: Response, @Param('fileName') fileName: string) {
     return await this.s3Service.downloadFile(res, fileName)
@@ -38,6 +40,7 @@ export class S3Controller {
 
   @Post('rename')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Rename an s3 file' })
   async renameFile(@Res() res: Response, @Body() body: RenameFileDto) {
     return await this.s3Service.renameFile(res, body)
@@ -45,6 +48,7 @@ export class S3Controller {
 
   @Get('url/:fileName')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get the URL of an object from an S3 bucket.' })
   async getUrl(@Res() res: Response, @Param('fileName') fileName: string) {
     return await this.s3Service.getObjectUrl(res, fileName)
@@ -52,6 +56,7 @@ export class S3Controller {
 
   @Get('')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List the objects in an S3 bucket.' })
   async listObjects(@Res() res: Response,) {
     return await this.s3Service.listObjects(res)

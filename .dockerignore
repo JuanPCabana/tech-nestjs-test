@@ -1,0 +1,13 @@
+# Excluir archivos y directorios específicos
+.env
+
+
+# Excluir todos los archivos .log
+*.log
+
+# Excluir todos los archivos .md en el directorio docs/
+/*.md
+
+# Excluir archivos y directorios basados en patrones globales
+*.txt
+**/node_modules/
